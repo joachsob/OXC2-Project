@@ -12,10 +12,7 @@ library(BiocParallel)
 register(SerialParam())
 
 seuratObj <- readRDS('oxcwtc_seurat.RDS')
-# <<<<<<< HEAD
 FeaturePlot(seuratObj, "ELOVL7", order = T)
-# =======
-#>>>>>>> 452d17045d574c7e160f4d6e3804b6878ff606ea
 
 perform_DEG_and_GSEA_analysis <- function(seuratObj, celltype_list, condition_pairs, condition_shortnames, 
                                           group_by1, group_by2, assay = "RNA", output_dir, 
