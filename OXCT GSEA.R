@@ -11,6 +11,8 @@ library(dplyr)
 library(BiocParallel)
 register(SerialParam())
 
+seuratObj <- readRDS('oxcwtc_seurat.RDS')
+
 perform_DEG_and_GSEA_analysis <- function(seuratObj, celltype_list, condition_pairs, condition_shortnames, 
                                           group_by1, group_by2, assay = "RNA", output_dir, 
                                           dea_method = c("MAST", "pseudobulk")) {

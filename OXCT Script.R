@@ -1,11 +1,11 @@
 library(Seurat)
 library(readxl)
-
+ # THIS SCRIPT IS CURRENTLY USING HCMV SCRIPT AS TEMPLATE, AND IS NOT UPDATED FOR OXC2
 seuratObj <- readRDS('oxcwtc_seurat.RDS')
 DimPlot(seuratObj, group.by = 'celltype', label = TRUE)
 FeaturePlot(seuratObj, c("SP100", "STAT1", "IFI16"), ncol = 1, split.by = "group", order = TRUE)
 
-#### Metadata ####
+#### Metadata #### #
 # Create metadata dataframe
 
 sample_metadata <- data.frame(
