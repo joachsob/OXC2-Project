@@ -11,6 +11,9 @@ library(dplyr)
 library(BiocParallel)
 register(SerialParam())
 
+seuratObj <- readRDS('oxcwtc_seurat.RDS')
+FeaturePlot(seuratObj, "ELOVL7", order = T)
+
 perform_DEG_and_GSEA_analysis <- function(seuratObj, celltype_list, condition_pairs, condition_shortnames, 
                                           group_by1, group_by2, assay = "RNA", output_dir, 
                                           dea_method = c("MAST", "pseudobulk")) {
@@ -295,3 +298,6 @@ perform_DEG_and_GSEA_analysis(
   output_dir = output_dir,
   dea_method = "MAST"
 )
+
+sample_subset <- subset(seuratObj, sample == "4-OXC2-DMSO-control")
+table(sample_subset$celltype)
