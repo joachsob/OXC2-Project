@@ -52,6 +52,29 @@ perform_DEG_and_GSEA_analysis <- function(seuratObj, celltype_list, condition_pa
       condition1 <- condition_pair[[1]]
       condition2 <- condition_pair[[2]]
       
+      # Count samples per condition
+      valid_meta <- celltype_subset@meta.data
+      samples_per_condition <- table(valid_meta[[group_by2]], valid_meta$sample)
+      
+      # Ensure both conditions are present
+      if (!(condition1 %in% rownames(samples_per_condition)) ||
+          !(condition2 %in% rownames(samples_per_condition))) {
+        message(paste("Skipping", short_name, "-", condition1, "vs", condition2, 
+                      "- one or both conditions missing"))
+        next
+      }
+      
+      # Number of valid samples per condition (with ≥ 20 cells)
+      condition1_sample_count <- sum(samples_per_condition[condition1, ] >= 20)
+      condition2_sample_count <- sum(samples_per_condition[condition2, ] >= 20)
+      
+      if (condition1_sample_count < 1 || condition2_sample_count < 1) {
+        message(paste("Skipping", short_name, "-", condition1, "vs", condition2, 
+                      "- not enough valid samples (≥1 required per condition)."))
+        next
+      }
+      
+      
       short_condition1 <- condition_shortnames[[condition1]]
       short_condition2 <- condition_shortnames[[condition2]]
       
@@ -59,7 +82,7 @@ perform_DEG_and_GSEA_analysis <- function(seuratObj, celltype_list, condition_pa
         # Perform single-cell DEA using MAST
         degs_df <- FindMarkers(
           celltype_subset, group.by = group_by2, assay = assay, verbose = TRUE,
-          ident.1 = condition1, ident.2 = condition2, min.pct = 0.1
+          ident.1 = condition1, ident.2 = condition2, test.use = 'MAST', min.pct = 0.1
         )
       } else {
         # Pseudobulk DEA
@@ -254,20 +277,20 @@ perform_DEG_and_GSEA_analysis <- function(seuratObj, celltype_list, condition_pa
 
 # Define cell types to analyze
 celltype_list <- list(
-  list(full_name = "vRG", short_name = "vRG"),
-  list(full_name = "Granule Cells", short_name = "Granule Cells"),
-  list(full_name = "NPCs", short_name = "NPCs"),
-  list(full_name = "Proliferating Progenitors", short_name = "Proliferating Progenitors"),
-  list(full_name = "SORCS1+ Immature Ex. Neurons", short_name = "SORCS1+ Immature Ex. Neurons"),
-  list(full_name = "GAD1/GAD2+ Inh. Neurons", short_name = "GAD1/GAD2+ Inh. Neurons"),
-  list(full_name = "oRG", short_name = "oRG"),
-  list(full_name = "Neuroblasts", short_name = "Neuroblasts"),
-  list(full_name = "ARPP21+ Immature Ex. Neurons", short_name = "ARPP21+ Immature Ex. Neurons"),
-  list(full_name = "RELN/GAD2+ Inh. Neurons", short_name = "RELN/GAD2+ Inh. Neurons"),
-  list(full_name = "Migratory Granule Cells", short_name = "Migratory Granule Cells"),
-  list(full_name = "GPC5/GAD2+ Inh. Neurons", short_name = "GPC5/GAD2+ Inh. Neurons"),
-  list(full_name = "Preplate Neurons", short_name = "Preplate Neurons"),
-  list(full_name = "ATP1A2+ Fibroblast-Like", short_name = "ATP1A2+ Fibroblast-Like")
+  # list(full_name = "vRG", short_name = "vRG"),
+  # list(full_name = "Granule Cells", short_name = "Granule Cells"),
+  # list(full_name = "NPCs", short_name = "NPCs"),
+  # list(full_name = "Proliferating Progenitors", short_name = "Proliferating Progenitors"),
+  # list(full_name = "SORCS1+ Immature Ex. Neurons", short_name = "SORCS1+ Immature Ex. Neurons"),
+  list(full_name = "GAD1 GAD2+ Inh. Neurons", short_name = "GAD1 GAD2+ Inh. Neurons"),
+  # list(full_name = "oRG", short_name = "oRG"),
+  # list(full_name = "Neuroblasts", short_name = "Neuroblasts"),
+  # list(full_name = "ARPP21+ Immature Ex. Neurons", short_name = "ARPP21+ Immature Ex. Neurons"),
+  list(full_name = "RELN GAD2+ Inh. Neurons", short_name = "RELN GAD2+ Inh. Neurons"),
+  # list(full_name = "Migratory Granule Cells", short_name = "Migratory Granule Cells"),
+  list(full_name = "GPC5 GAD2+ Inh. Neurons", short_name = "GPC5 GAD2+ Inh. Neurons")
+  # list(full_name = "Preplate Neurons", short_name = "Preplate Neurons"),
+  # list(full_name = "ATP1A2+ Fibroblast-Like", short_name = "ATP1A2+ Fibroblast-Like")
 )
 
 
@@ -279,8 +302,8 @@ condition_pairs <- list(
 
 # Define short names for conditions
 condition_shortnames <- list(
-  "WTC" = "WTC",
-  "OXC" = "OXC"
+  "OXC" = "OXC",
+  "WTC" = "WTC"
 )
 
 # Define output directory
