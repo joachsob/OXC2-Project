@@ -199,11 +199,6 @@ number_degs_combined +
   )
 
 #### Sort DEGs per celltype per treatment ####
-x <- split(number_degs, number_degs$data$CellType)
-number_degs$data
-nDEGData <- number_degs$data
-nDEGData$CellType[1]
-
 number_degs_control$data
 
 write_xlsx(number_degs_control$data, "./testDEG.xlsx")
