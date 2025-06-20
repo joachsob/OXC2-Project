@@ -13,7 +13,7 @@ register(SerialParam())
 library(readxl)
 
 seuratObj <- readRDS('oxcwtc_seurat.RDS')
-newAnnot <- read.xlsx("OXC2 Celltypes.xlsx") # Fixed the celltype names containing a slash
+newAnnot <- read.xlsx("Annotation.xlsx") # Fixed the celltype names containing a slash
 seuratObj$celltype <- newAnnot$celltype[match(seuratObj$seurat_clusters, newAnnot$cluster)]
 
 FeaturePlot(seuratObj, "ELOVL7", order = T)
@@ -282,19 +282,19 @@ perform_DEG_and_GSEA_analysis <- function(seuratObj, celltype_list, condition_pa
 # Define cell types to analyze
 celltype_list <- list(
   list(full_name = "vRG", short_name = "vRG"),
-  # list(full_name = "Granule Cells", short_name = "Granule Cells"),
-  # list(full_name = "NPCs", short_name = "NPCs"),
-  # list(full_name = "Proliferating Progenitors", short_name = "Proliferating Progenitors"),
-  # list(full_name = "SORCS1+ Immature Ex. Neurons", short_name = "SORCS1+ Immature Ex. Neurons"),
-  list(full_name = "GAD1GAD2+ Inh. Neurons", short_name = "GAD1GAD2+ Inh. Neurons"),
-  # list(full_name = "oRG", short_name = "oRG"),
-  # list(full_name = "Neuroblasts", short_name = "Neuroblasts"),
-  # list(full_name = "ARPP21+ Immature Ex. Neurons", short_name = "ARPP21+ Immature Ex. Neurons"),
+  list(full_name = "Granule Cells", short_name = "Granule Cells"),
+  list(full_name = "NPCs", short_name = "NPCs"),
+  list(full_name = "Proliferating Progenitors", short_name = "Proliferating Progenitors"),
+  list(full_name = "SORCS1+ Immature Ex. Neurons", short_name = "SORCS1+ Immature Ex. Neurons"),
+  list(full_name = "GAD1GAD2+ Granule Cells", short_name = "GAD1GAD2+ Granule Cells"),
+  list(full_name = "oRG", short_name = "oRG"),
+  list(full_name = "Neuroblasts", short_name = "Neuroblasts"),
+  list(full_name = "ARPP21+ Immature Ex. Neurons", short_name = "ARPP21+ Immature Ex. Neurons"),
   list(full_name = "RELNGAD2+ Inh. Neurons", short_name = "RELNGAD2+ Inh. Neurons"),
-  # list(full_name = "Migratory Granule Cells", short_name = "Migratory Granule Cells"),
-  list(full_name = "GPC5GAD2+ Inh. Neurons", short_name = "GPC5GAD2+ Inh. Neurons")
-  # list(full_name = "Preplate Neurons", short_name = "Preplate Neurons"),
-  # list(full_name = "ATP1A2+ Fibroblast-Like", short_name = "ATP1A2+ Fibroblast-Like")
+  list(full_name = "Migratory Granule Cells", short_name = "Migratory Granule Cells"),
+  list(full_name = "GPC5GAD2+ Inh. Neurons", short_name = "GPC5GAD2+ Inh. Neurons"),
+  list(full_name = "Preplate Neurons", short_name = "Preplate Neurons"),
+  list(full_name = "ATP1A2+ Fibroblast-Like", short_name = "ATP1A2+ Fibroblast-Like")
 )
 
 
@@ -311,7 +311,7 @@ condition_shortnames <- list(
 )
 
 # Define output directory
-output_dir <- "./GSEA results/OXC2 control vs WTC control"
+output_dir <- "./temp GSEA/"
 
 # Run the analysis using pseudobulk
 perform_DEG_and_GSEA_analysis(
