@@ -13,10 +13,11 @@ register(SerialParam())
 library(readxl)
 library(writexl)
 library(presto)
+library(tidyr)
 
 seuratObj <- readRDS('oxcwtc_seurat.RDS')
-newAnnot <- read.xlsx("Annotation.xlsx") # Fixed the celltype names containing a slash
-seuratObj$celltype <- newAnnot$celltype[match(seuratObj$seurat_clusters, newAnnot$cluster)] # match the new celltype names to the seuratObj
+# newAnnot <- read.xlsx("Annotation.xlsx") # Fixed the celltype names containing a slash
+# seuratObj$celltype <- newAnnot$celltype[match(seuratObj$seurat_clusters, newAnnot$cluster)] # match the new celltype names to the seuratObj
 saveRDS(seuratObj, "oxcwtc_seurat.RDS") # save the updated seuratObj in the RDS-file
 
 seuratObj <- PrepSCTFindMarkers(seuratObj)
@@ -85,8 +86,8 @@ celltype_list <- list(
   list(full_name = "RELNGAD2+ Inh. Neurons", short_name = "RELNGAD2+ Inh. Neurons"),
   list(full_name = "Migratory Granule Cells", short_name = "Migratory Granule Cells"),
   list(full_name = "GPC5GAD2+ Inh. Neurons", short_name = "GPC5GAD2+ Inh. Neurons"),
-  list(full_name = "Preplate Neurons", short_name = "Preplate Neurons"),
-  list(full_name = "ATP1A2+ Fibroblast-Like", short_name = "ATP1A2+ Fibroblast-Like")
+  list(full_name = "Preplate Neurons", short_name = "Preplate Neurons")
+  # list(full_name = "ATP1A2+ Fibroblast-Like", short_name = "ATP1A2+ Fibroblast-Like") # få celler for combined treatment, fjernes for DEG analyse
 )
 
 # unique(seuratObj$celltype)
@@ -97,12 +98,14 @@ condition_shortnames <- list(
   "WTC" = "WTC"
 )
 
-#### DEGs for control treatment (DMSO) ####
+#### DEGs ####
+
 # Define condition pairs for differential expression analysis
 condition_pairs <- list(
   c("4-OXC2-DMSO-control", "11-WTC-control")
 )
 
+# DEGs for control treatment
 number_degs_control <- count_DEGs_wilcox(seuratObj, 
                                  celltype_list = celltype_list, 
                                  condition_pairs = condition_pairs, 
@@ -148,7 +151,6 @@ number_degs_Mig +
     plot.title = element_text(size = 14, face = "bold")
   )
 
-#### DEGs for acetyl-leucine treatment ####
 condition_pairs <- list(
   c("2-OXC2-Acetyl-leucine", "8-WTC-Acetyl-leucine")
 )
@@ -173,10 +175,11 @@ number_degs_ace_leu +
     plot.title = element_text(size = 14, face = "bold")
   )
 
-#### DEGs for combined Mig-ace-leu treatment ####
 condition_pairs <- list(
   c("3-OXC2-Mig-ace-leu", "9-WTC-Mig-ace-leu")
 )
+
+# This analysis excludes ATP1A2+ Fibroblast-Like from the cellist because these have too few cells
 
 number_degs_combined <- count_DEGs_wilcox(seuratObj, 
                                  celltype_list = celltype_list, 
@@ -198,9 +201,46 @@ number_degs_combined +
     plot.title = element_text(size = 14, face = "bold")
   )
 
-#### Sort DEGs per celltype per treatment ####
-number_degs_control$data
+# Now include the missing celltype and result to the number_DEGs_combined$data dataframe to continue with analysis
+missing_cell <- data.frame(CellType = "ATP1A2+ Fibroblast-Like", DEG_Count = NA)
+number_degs_combined$data <- rbind(number_degs_combined$data, missing_cell)
 
-write_xlsx(number_degs_control$data, "./testDEG.xlsx")
-x <- read_xlsx("./testDEG.xlsx")
-x
+#### Manage DEG-data ####
+wb <- loadWorkbook("./completeDEGdata.xlsx")
+deg_df <- data.frame(
+  Celltype = c(
+    "vRG",
+    "Granule Cells",
+    "NPCs",
+    "Proliferating Progenitors",
+    "SORCS1+ Immature Ex. Neurons",
+    "GAD1GAD2+ Granule Cells",
+    "oRG",
+    "Neuroblasts",
+    "ARPP21+ Immature Ex. Neurons",
+    "RELNGAD2+ Inh. Neurons",
+    "Migratory Granule Cells",
+    "GPC5GAD2+ Inh. Neurons",
+    "Preplate Neurons",
+    "ATP1A2+ Fibroblast-Like"
+    ),
+  
+  ControlDEGs = number_degs_control$data$DEG_Count,
+  
+  MigDEGs = number_degs_Mig$data$DEG_Count,
+  
+  AceLeuDEGs = number_degs_ace_leu$data$DEG_Count,
+
+  CombinedDEGs = number_degs_combined$data$DEG_Count
+  )
+
+write_xlsx(deg_df, path = "./completeDEGdata.xlsx")
+
+deg_data <- read_excel("./completeDEGdata.xlsx")
+deg_data$CombinedDEGs <- as.numeric(deg_data$CombinedDEGs) # after adjusting this dataframe the datatype is set to chr
+deg_long <- pivot_longer(deg_data, 
+                         cols = -Celltype, 
+                         names_to = "Treatment", 
+                         values_to = "DEG_Count")
+
+
