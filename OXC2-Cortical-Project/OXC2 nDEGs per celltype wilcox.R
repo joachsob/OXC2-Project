@@ -234,13 +234,29 @@ deg_df <- data.frame(
   CombinedDEGs = number_degs_combined$data$DEG_Count
   )
 
-write_xlsx(deg_df, path = "./completeDEGdata.xlsx")
+write_xlsx(deg_df, path = "./DEGs/completeDEGdata.xlsx")
 
-deg_data <- read_excel("./completeDEGdata.xlsx")
+deg_data <- read_excel(".//DEGs/completeDEGdata.xlsx")
 deg_data$CombinedDEGs <- as.numeric(deg_data$CombinedDEGs) # after adjusting this dataframe the datatype is set to chr
 deg_long <- pivot_longer(deg_data, 
                          cols = -Celltype, 
                          names_to = "Treatment", 
                          values_to = "DEG_Count")
 
+#### Plotting the DEGs ####
 
+ggplot(deg_long, aes(x = Celltype, y = DEG_Count, fill = Treatment)) +
+        geom_bar(stat = "identity", position = position_dodge(width = 0.6), width = 0.6) +
+        theme_minimal() +
+        labs(title = "Number of significant DEGs per Celltype and Treatment",
+             x = "Cell Type",
+             y = "Number of Significant DEGs (p.adj < 0.05 & abs(avg.log2FC) > 1))") +
+  theme(
+    axis.text = element_text(angle = 70, hjust = 1),
+    axis.title.y = element_text(size = 10)
+    ) +
+  
+  scale_fill_manual(values = c("ControlDEGs" = "grey",
+                               "MigDEGs" = "steelblue",
+                               "AceLeuDEGs" = "darkorange",
+                               "CombinedDEGs" = "forestgreen"))
