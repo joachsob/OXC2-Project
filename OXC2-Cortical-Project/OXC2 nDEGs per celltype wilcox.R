@@ -251,12 +251,20 @@ ggplot(deg_long, aes(x = Celltype, y = DEG_Count, fill = Treatment)) +
         labs(title = "Number of significant DEGs per Celltype and Treatment",
              x = "Cell Type",
              y = "Number of Significant DEGs (p.adj < 0.05 & abs(avg.log2FC) > 1))") +
+  coord_flip() +
   theme(
-    axis.text = element_text(angle = 70, hjust = 1),
-    axis.title.y = element_text(size = 10)
+    axis.text = element_text(hjust = 1),
+    axis.title.y = element_text(size = 10, margin = margin(r = 10)),
+    axis.title.x = element_text(size = 10, margin = margin(b = 10))
     ) +
   
   scale_fill_manual(values = c("ControlDEGs" = "grey",
                                "MigDEGs" = "steelblue",
                                "AceLeuDEGs" = "darkorange",
-                               "CombinedDEGs" = "forestgreen"))
+                               "CombinedDEGs" = "forestgreen"),
+                    labels = c(
+                      "ControlDEGs" = "DMSO (Control)",
+                      "MigDEGs" = "Miglustat (100uM)",
+                      "AceLeuDEGs" = "Acetyl-Leucine (1mg/ml)",
+                      "CombinedDEGs" = "Combined Miglustat (100uM)\n + AceLeu (1mg/ml)"
+                    ))
