@@ -276,7 +276,7 @@ deg_long <- pivot_longer(deg_data,
 
 #### Plotting the DEGs ####
 
-# Line for ordering the treatments in metadata for the tratment to have correct order in the plot
+# Line for ordering the treatments in metadata for the treatment to have correct order in the plot
 deg_long$Treatment <- factor(deg_long$Treatment, levels = c("ControlDEGs", "MigDEGs", "AceLeuDEGs", "CombinedDEGs"))
 
 # Setting the order in which the cells appear on the x-axis so similar celltypes are close to eachother
@@ -326,7 +326,7 @@ ggplot(deg_long, aes(x = Celltype, y = DEG_Count, fill = Treatment)) +
 
 #### Plotting explicitly for specific treatments ####
 deg_long %>% 
-  filter(Treatment %in% c("ControlDEGs", "CombinedDEGs")) %>%
+  filter(Treatment %in% c("ControlDEGs", "CombinedDEGs")) %>% # this line filters which treatments are included in the plot
   ggplot(aes(x = Celltype, y = DEG_Count, fill = Treatment)) +
     geom_bar(stat = "identity", position = position_dodge(width = 0.6), width = 0.6) +
     theme_minimal() +
