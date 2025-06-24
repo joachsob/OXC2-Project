@@ -126,7 +126,7 @@ number_degs_control +
     plot.title = element_text(size = 14, face = "bold")
   )
 
-# DEGs for Miglustat treatment
+#### DEGs for Miglustat treatment ####
 condition_pairs <- list(
   c("1-OXC2-Miglustat-100uM", "6-WTC-Miglustat-100uM")
 )
@@ -151,7 +151,6 @@ number_degs_Mig +
     plot.title = element_text(size = 14, face = "bold")
   )
 
-# DEGs for Ace-Leu treatment
 condition_pairs <- list(
   c("2-OXC2-Acetyl-leucine", "8-WTC-Acetyl-leucine")
 )
@@ -176,7 +175,6 @@ number_degs_ace_leu +
     plot.title = element_text(size = 14, face = "bold")
   )
 
-# DEGs for combined treatment
 condition_pairs <- list(
   c("3-OXC2-Mig-ace-leu", "9-WTC-Mig-ace-leu")
 )
@@ -247,16 +245,20 @@ deg_long <- pivot_longer(deg_data,
 
 #### Plotting the DEGs ####
 
+# Line for ordering the treatments in metadata for the tratment to have correct order in the plot
+deg_long$Treatment <- factor(deg_long$Treatment, levels = c("ControlDEGs", "MigDEGs", "AceLeuDEGs", "CombinedDEGs"))
+
+
 ggplot(deg_long, aes(x = Celltype, y = DEG_Count, fill = Treatment)) +
         geom_bar(stat = "identity", position = position_dodge(width = 0.6), width = 0.6) +
         theme_minimal() +
         labs(title = "Number of significant DEGs per Celltype and Treatment",
              x = "Cell Type",
              y = "Number of Significant DEGs (p.adj < 0.05 & abs(avg.log2FC) > 1))") +
-  coord_flip() +
   theme(
-    axis.text = element_text(hjust = 1),
-    axis.title.y = element_text(size = 10, margin = margin(r = 10)),
+    plot.title = element_text(hjust = 0.5),
+    axis.text = element_text(hjust = 1, angle = 60),
+    axis.title.y = element_text(size = 10, margin = margin(l = 10)),
     axis.title.x = element_text(size = 10, margin = margin(b = 10))
     ) +
   
