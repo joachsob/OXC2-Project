@@ -126,7 +126,7 @@ number_degs_control +
     plot.title = element_text(size = 14, face = "bold")
   )
 
-#### DEGs for Miglustat treatment ####
+# DEGs for Miglustat treatment
 condition_pairs <- list(
   c("1-OXC2-Miglustat-100uM", "6-WTC-Miglustat-100uM")
 )
@@ -151,6 +151,7 @@ number_degs_Mig +
     plot.title = element_text(size = 14, face = "bold")
   )
 
+# DEGs for Ace-Leu treatment
 condition_pairs <- list(
   c("2-OXC2-Acetyl-leucine", "8-WTC-Acetyl-leucine")
 )
@@ -175,6 +176,7 @@ number_degs_ace_leu +
     plot.title = element_text(size = 14, face = "bold")
   )
 
+# DEGs for combined treatment
 condition_pairs <- list(
   c("3-OXC2-Mig-ace-leu", "9-WTC-Mig-ace-leu")
 )
