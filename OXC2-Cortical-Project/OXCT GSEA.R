@@ -13,8 +13,8 @@ register(SerialParam())
 library(readxl)
 
 seuratObj <- readRDS('oxcwtc_seurat.RDS')
-newAnnot <- read.xlsx("Annotation.xlsx") # Fixed the celltype names containing a slash
-seuratObj$celltype <- newAnnot$celltype[match(seuratObj$seurat_clusters, newAnnot$cluster)]
+# newAnnot <- read.xlsx("Annotation.xlsx") # Fixed the celltype names containing a slash
+# seuratObj$celltype <- newAnnot$celltype[match(seuratObj$seurat_clusters, newAnnot$cluster)]
 
 FeaturePlot(seuratObj, "ELOVL7", order = T)
 
@@ -301,7 +301,7 @@ celltype_list <- list(
 
 # Define condition pairs for differential expression analysis
 condition_pairs <- list(
-  c("3-OXC2-Mig-ace-leu", "9-WTC-Mig-ace-leu")
+  c("3-OXC2-Mig-ace-leu", "4-OXC2-DMSO-control")
 )
 
 # Define short names for conditions
@@ -311,9 +311,9 @@ condition_shortnames <- list(
 )
 
 # Define output directory
-output_dir <- "./GSEA results/OXC2 combined vs WTC combined"
+output_dir <- "./GSEA results/OXC2 Combined vs OXC2 Control"
 
-# Run the analysis using pseudobulk
+# Run the analysis using MAST
 perform_DEG_and_GSEA_analysis(
   seuratObj = seuratObj,
   celltype_list = celltype_list,
