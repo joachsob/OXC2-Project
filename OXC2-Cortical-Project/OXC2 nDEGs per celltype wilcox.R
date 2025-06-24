@@ -350,3 +350,21 @@ deg_long %>%
                       "AceLeuDEGs" = "Acetyl-Leucine (1mg/ml)",
                       "CombinedDEGs" = "Combined Miglustat (100uM)\n + AceLeu (1mg/ml)"
                     ))
+
+#### Trying to sort for number of cell of each celltypes in each treatment for debug purposes ####
+
+nCells_celltype_treatment <- table(seuratObj$sample, seuratObj$celltype)
+nCells_celltype_treatment <- as.data.frame(nCells_celltype_treatment)
+nCells_celltype_treatment <- nCells_celltype_treatment %>% rename(Cellcount = Freq)
+write.xlsx(nCells_celltype_treatment, "./nCells per celltype per treatment.xlsx")
+
+
+filtered_nCells <- nCells_celltype_treatment %>% filter(
+  Treatment %in% c("3-OXC2-Mig-ace-leu", "4-OXC2-DMSO-control"),
+  Celltype %in% c("oRG", "ARPP21+ Immature Ex. Neurons", "Migratory Granule Cells", "GPC5GAD2+ Inh. Neurons", "Preplate Neurons", "ATP1A2+ Fibroblast Like")
+  )
+
+filtered_nCells
+
+library(knitr)
+kable(filtered_nCells, format = "markdown")
