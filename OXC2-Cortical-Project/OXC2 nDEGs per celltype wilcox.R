@@ -363,17 +363,26 @@ nCells_celltype_treatment <- read_xlsx("./nCells per celltype per treatment.xlsx
 head(nCells_celltype_treatment)
 
 # sort the number of cells in only the OXC2 samples by treatment, disregarding celltype
-sort_nCells_OXC2 <- nCells_celltype_treatment %>% filter(grepl("OXC2", Treatment)) %>% #'grepl' for finding samples containing the 'OXC2' phrase
-  group_by(Treatment, Celltype) %>% # grouping the data by treatment
-  summarise(Total_Cells = sum(Cellcount)) %>% # finding the total number of cells in each treatment
-  arrange(Total_Cells) # sort them in ascending order
+sort_nCells_OXC2 <- nCells_celltype_treatment %>% 
+  filter(grepl("OXC2", Treatment)) %>% #'grepl' for finding samples containing the 'OXC2' phrase
+  group_by(Treatment) %>% # grouping the data by treatment
+  summarise(Total_Cells = sum(Cellcount)) # %>% # finding the total number of cells in each treatment
+  # arrange(Total_Cells) # sort them in ascending order
+sort_nCells_OXC2$Treatment <- factor(sort_nCells_OXC2$Treatment, levels = c(
+  "4-OXC2-DMSO-control", "1-OXC2-Miglustat-100uM", "2-OXC2-Acetyl-leucine", "3-OXC2-Mig-ace-leu"
+))
+sort_nCells_OXC2 <- arrange(sort_nCells_OXC2, Treatment)
 sort_nCells_OXC2
 
 # same process as for sort_nCells_OXC2
-sort_nCells_WTC <- nCells_celltype_treatment %>% filter(grepl("WTC", Treatment)) %>%
+sort_nCells_WTC <- nCells_celltype_treatment %>% 
+  filter(grepl("WTC", Treatment)) %>%
   group_by(Treatment) %>%
-  summarise(Total_Cells = sum(Cellcount)) %>%
-  arrange(Total_Cells)
+  summarise(Total_Cells = sum(Cellcount)) #%>%
+  # arrange(Total_Cells)
+sort_nCells_WTC$Treatment <- factor(sort_nCells_WTC$Treatment, levels = c(
+  "11-WTC-control", "6-WTC-Miglustat-100uM","8-WTC-Acetyl-leucine", "9-WTC-Mig-ace-leu"))
+sort_nCells_WTC <- arrange(sort_nCells_WTC, Treatment)
 sort_nCells_WTC
 
 # extract the information on combined and control treatment for OXC2 specifically for the celltypes excluded from the GSEA
@@ -386,4 +395,4 @@ filtered_nCells
 
 # for getting a formatted table of the filtered cells (above)
 library(knitr)
-kable(filtered_nCells, format = "markdown")
+kable(sort_nCells_OXC2, format = "markdown")
