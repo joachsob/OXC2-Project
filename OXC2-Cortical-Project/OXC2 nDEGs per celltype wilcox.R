@@ -353,18 +353,37 @@ deg_long %>%
 
 #### Trying to sort for number of cell of each celltypes in each treatment for debug purposes ####
 
-nCells_celltype_treatment <- table(seuratObj$sample, seuratObj$celltype)
-nCells_celltype_treatment <- as.data.frame(nCells_celltype_treatment)
-nCells_celltype_treatment <- nCells_celltype_treatment %>% rename(Cellcount = Freq)
-write.xlsx(nCells_celltype_treatment, "./nCells per celltype per treatment.xlsx")
+# nCells_celltype_treatment <- table(seuratObj$sample, seuratObj$celltype)
+# nCells_celltype_treatment <- as.data.frame(nCells_celltype_treatment)
+# nCells_celltype_treatment <- nCells_celltype_treatment %>% rename(Cellcount = Freq)
+# write.xlsx(nCells_celltype_treatment, "./nCells per celltype per treatment.xlsx")
 
+# get the datafram containing information on cellcount for each celltype and treatment
+nCells_celltype_treatment <- read_xlsx("./nCells per celltype per treatment.xlsx")
+head(nCells_celltype_treatment)
 
+# sort the number of cells in only the OXC2 samples by treatment, disregarding celltype
+sort_nCells_OXC2 <- nCells_celltype_treatment %>% filter(grepl("OXC2", Treatment)) %>% #'grepl' for finding samples containing the 'OXC2' phrase
+  group_by(Treatment, Celltype) %>% # grouping the data by treatment
+  summarise(Total_Cells = sum(Cellcount)) %>% # finding the total number of cells in each treatment
+  arrange(Total_Cells) # sort them in ascending order
+sort_nCells_OXC2
+
+# same process as for sort_nCells_OXC2
+sort_nCells_WTC <- nCells_celltype_treatment %>% filter(grepl("WTC", Treatment)) %>%
+  group_by(Treatment) %>%
+  summarise(Total_Cells = sum(Cellcount)) %>%
+  arrange(Total_Cells)
+sort_nCells_WTC
+
+# extract the information on combined and control treatment for OXC2 specifically for the celltypes excluded from the GSEA
+# to look at the cellcounts
 filtered_nCells <- nCells_celltype_treatment %>% filter(
   Treatment %in% c("3-OXC2-Mig-ace-leu", "4-OXC2-DMSO-control"),
   Celltype %in% c("oRG", "ARPP21+ Immature Ex. Neurons", "Migratory Granule Cells", "GPC5GAD2+ Inh. Neurons", "Preplate Neurons", "ATP1A2+ Fibroblast Like")
   )
-
 filtered_nCells
 
+# for getting a formatted table of the filtered cells (above)
 library(knitr)
 kable(filtered_nCells, format = "markdown")
