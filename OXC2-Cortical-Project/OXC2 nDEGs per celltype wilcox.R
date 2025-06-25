@@ -396,3 +396,21 @@ filtered_nCells
 # for getting a formatted table of the filtered cells (above)
 library(knitr)
 kable(sort_nCells_OXC2, format = "markdown")
+
+
+# getting number of neuroblasts in each treatment
+nNeuroblasts <- nCells_celltype_treatment %>% 
+  filter(grepl("OXC2|WTC", Treatment), # extract line if 'OXC2' or 'WTC' is in the Treatment-name
+         Celltype %in% "Neuroblasts") %>% # extract line if the Celltype is 'Neuroblast'
+         group_by(Treatment) %>% # group the result by Treatment (the same treatments will be next to eachother)
+         summarise(Total_Cells = sum(Cellcount))
+nNeuroblasts
+
+# get number of neuroblasts per group (total over all oxc2 treatments and wtc treatments)
+nNeuroblasts <- nNeuroblasts %>%
+  mutate(Source = ifelse(grepl("OXC2", Treatment), "OXC2", "WTC")) %>% #add column 'Source', add OXC2 if 'OXC2' is in the Treatment-name, else 'WTC'
+  group_by(Source) %>%
+  summarise(Total_Neuroblasts = sum(Total_Cells))
+nNeuroblasts
+
+kable(nNeuroblasts, format = "markdown")
