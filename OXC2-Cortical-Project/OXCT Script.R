@@ -15,11 +15,32 @@ treatment_order <- c(
 )
 seuratObj$sample <- factor(seuratObj$sample, levels = treatment_order)
 
+#### Adding metadata for groups for permutation plot ####
+sample_metadata <- data.frame(
+  group = c(
+    "WTC", "WTC", "WTC","WTC",
+    "OXC2", "OXC2", "OXC2", "OXC2"
+  ),
+  
+  samples = c(
+    "11-WTC-control",
+    "6-WTC-Miglustat-100uM",
+    "8-WTC-Acetyl-leucine",
+    "9-WTC-Mig-ace-leu",
+    "4-OXC2-DMSO-control",
+    "1-OXC2-Miglustat-100uM",
+    "2-OXC2-Acetyl-leucine",
+    "3-OXC2-Mig-ace-leu"
+  )
+)
+
+seuratObj$group <- sample_metadata$group[match(seuratObj$sample, sample_metadata$samples)]
+table(seuratObj$group)
+
+#### ####
 DimPlot(seuratObj, split.by = "sample", label = TRUE, repel = TRUE, ncol = 4)
 FeaturePlot(seuratObj, c("SP100", "STAT1", "IFI16"), ncol = 1, split.by = "group", order = TRUE)
 
-
-#### ####
 DimPlot(seuratObj, group.by = 'seurat_clusters', label = TRUE, repel = T)
 
 #### Create and list markers ####
