@@ -386,10 +386,11 @@ sort_nCells_WTC <- arrange(sort_nCells_WTC, Treatment)
 sort_nCells_WTC
 
 # extract the information on combined and control treatment for OXC2 specifically for the celltypes excluded from the GSEA
-# to look at the cellcounts
+# to look at the cellcounts.
+# filter cellcount for specific celltypes in specific treatments
 filtered_nCells <- nCells_celltype_treatment %>% filter(
-  Treatment %in% c("3-OXC2-Mig-ace-leu", "4-OXC2-DMSO-control"),
-  Celltype %in% c("oRG", "ARPP21+ Immature Ex. Neurons", "Migratory Granule Cells", "GPC5GAD2+ Inh. Neurons", "Preplate Neurons", "ATP1A2+ Fibroblast Like")
+  # Treatment %in% c("3-OXC2-Mig-ace-leu", "4-OXC2-DMSO-control"),
+  Celltype %in% c("Neuroblasts", "ATP1A2+ Fibroblast Like")
   )
 filtered_nCells
 
@@ -397,16 +398,17 @@ filtered_nCells
 library(knitr)
 kable(sort_nCells_OXC2, format = "markdown")
 
+#### Cellcount per celltype per group (whole OXC2 and WTC) ####
 
 # getting number of cells for a specific celltype in each treatment
 # change the name of the celltypeOI to the celltype of interest
-celltypeOI <- "oRG"
+celltypeOI <- "Neuroblasts"
 nCelltype <- nCells_celltype_treatment %>% 
   filter(grepl("OXC2|WTC", Treatment), # extract line if 'OXC2' or 'WTC' is in the Treatment-name
          Celltype %in% celltypeOI) %>% # extract line if the Celltype is 'Neuroblast'
          group_by(Treatment) %>% # group the result by Treatment (the same treatments will be next to eachother)
          summarise(Total_Cells = sum(Cellcount))
-# nCelltype
+
 
 # get number of celltype per group (total over all oxc2 treatments and wtc treatments)
 nCelltype <- nCelltype %>%
@@ -416,4 +418,6 @@ nCelltype <- nCelltype %>%
 colnames(nCelltype)[2] <- paste0("Total_", celltypeOI) # change column name of cellcount dynamically
 nCelltype
 
+#### ####
+# Formatted table 
 kable(nCelltype, format = "markdown")
