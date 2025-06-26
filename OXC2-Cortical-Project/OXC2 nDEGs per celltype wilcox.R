@@ -15,6 +15,7 @@ library(writexl)
 library(presto)
 library(tidyr)
 library(ggplot2)
+library(knitr) # for formatted talbes (function kable)
 
 seuratObj <- readRDS('oxcwtc_seurat.RDS')
 # newAnnot <- read.xlsx("Annotation.xlsx") # Fixed the celltype names containing a slash
@@ -231,41 +232,43 @@ missing_cell <- data.frame(CellType = "ATP1A2+ Fibroblast-Like", DEG_Count = NA)
 number_degs_combined$data <- rbind(number_degs_combined$data, missing_cell)
 
 #### Manage DEG-data ####
-wb <- loadWorkbook("./DEGs/completeDEGdata.xlsx")
-deg_df <- data.frame(
-  Celltype = c(
-    "vRG",
-    "Granule Cells",
-    "NPCs",
-    "Proliferating Progenitors",
-    "SORCS1+ Immature Ex. Neurons",
-    "GAD1GAD2+ Granule Cells",
-    "oRG",
-    "Neuroblasts",
-    "ARPP21+ Immature Ex. Neurons",
-    "RELNGAD2+ Inh. Neurons",
-    "Migratory Granule Cells",
-    "GPC5GAD2+ Inh. Neurons",
-    "Preplate Neurons",
-    "ATP1A2+ Fibroblast-Like"
-    ),
-  
-  ControlDEGs = number_degs_control$data$DEG_Count,
-  
-  MigDEGs = number_degs_Mig$data$DEG_Count,
-  
-  AceLeuDEGs = number_degs_ace_leu$data$DEG_Count,
+# the next few lines were a one-time formatting of the data frame and excel file
+      # wb <- loadWorkbook("./DEGs/completeDEGdata.xlsx")
+      # deg_df <- data.frame(
+      #   Celltype = c(
+      #     "vRG",
+      #     "Granule Cells",
+      #     "NPCs",
+      #     "Proliferating Progenitors",
+      #     "SORCS1+ Immature Ex. Neurons",
+      #     "GAD1GAD2+ Granule Cells",
+      #     "oRG",
+      #     "Neuroblasts",
+      #     "ARPP21+ Immature Ex. Neurons",
+      #     "RELNGAD2+ Inh. Neurons",
+      #     "Migratory Granule Cells",
+      #     "GPC5GAD2+ Inh. Neurons",
+      #     "Preplate Neurons",
+      #     "ATP1A2+ Fibroblast-Like"
+      #     ),
+      #   
+      #   ControlDEGs = number_degs_control$data$DEG_Count,
+      #   
+      #   MigDEGs = number_degs_Mig$data$DEG_Count,
+      #   
+      #   AceLeuDEGs = number_degs_ace_leu$data$DEG_Count,
+      # 
+      #   CombinedDEGs = number_degs_combined$data$DEG_Count
+      #   )
+      # 
+      # write_xlsx(deg_df, path = "./DEGs/completeDEGdata.xlsx")
+      # 
+      # deg_data <- read_excel("./DEGs/completeDEGdata.xlsx")
+      # deg_data$CombinedDEGs <- as.numeric(deg_data$CombinedDEGs) # after adjusting this dataframe the datatype is set to chr
+      # 
+      # # update the excel file with corrected datatype for combined treatment values
+      # write_xlsx(deg_data, path = "./DEGs/completeDEGdata.xlsx")
 
-  CombinedDEGs = number_degs_combined$data$DEG_Count
-  )
-
-write_xlsx(deg_df, path = "./DEGs/completeDEGdata.xlsx")
-
-deg_data <- read_excel("./DEGs/completeDEGdata.xlsx")
-deg_data$CombinedDEGs <- as.numeric(deg_data$CombinedDEGs) # after adjusting this dataframe the datatype is set to chr
-
-# update the excel file with corrected datatype for combined treatment values
-write_xlsx(deg_data, path = "./DEGs/completeDEGdata.xlsx") 
 deg_data <- read_excel("./DEGs/completeDEGdata.xlsx")
 
 # create long-format to collect a frame with celltypes, treatments, and DEG count
@@ -324,7 +327,7 @@ ggplot(deg_long, aes(x = Celltype, y = DEG_Count, fill = Treatment)) +
                       "CombinedDEGs" = "Combined Miglustat (100uM)\n + AceLeu (1mg/ml)"
                     ))
 
-#### Plotting explicitly for specific treatments ####
+#### Plotting for specific treatments ####
 deg_long %>% 
   filter(Treatment %in% c("ControlDEGs", "CombinedDEGs")) %>% # this line filters which treatments are included in the plot
   ggplot(aes(x = Celltype, y = DEG_Count, fill = Treatment)) +
@@ -353,14 +356,14 @@ deg_long %>%
 
 #### Trying to sort for number of cell of each celltypes in each treatment for debug purposes ####
 
-# nCells_celltype_treatment <- table(seuratObj$sample, seuratObj$celltype)
-# nCells_celltype_treatment <- as.data.frame(nCells_celltype_treatment)
-# nCells_celltype_treatment <- nCells_celltype_treatment %>% rename(Cellcount = Freq)
-# write.xlsx(nCells_celltype_treatment, "./nCells per celltype per treatment.xlsx")
+    # nCells_celltype_treatment <- table(seuratObj$sample, seuratObj$celltype)
+    # nCells_celltype_treatment <- as.data.frame(nCells_celltype_treatment)
+    # nCells_celltype_treatment <- nCells_celltype_treatment %>% rename(Cellcount = Freq)
+    # write.xlsx(nCells_celltype_treatment, "./nCells per celltype per treatment.xlsx")
 
-# get the datafram containing information on cellcount for each celltype and treatment
+# get the dataframe containing information on cellcount for each celltype and treatment
 nCells_celltype_treatment <- read_xlsx("./nCells per celltype per treatment.xlsx")
-head(nCells_celltype_treatment)
+head(nCells_celltype_treatment, n = 10)
 
 # sort the number of cells in only the OXC2 samples by treatment, disregarding celltype
 sort_nCells_OXC2 <- nCells_celltype_treatment %>% 
@@ -371,7 +374,7 @@ sort_nCells_OXC2 <- nCells_celltype_treatment %>%
 sort_nCells_OXC2$Treatment <- factor(sort_nCells_OXC2$Treatment, levels = c(
   "4-OXC2-DMSO-control", "1-OXC2-Miglustat-100uM", "2-OXC2-Acetyl-leucine", "3-OXC2-Mig-ace-leu"
 ))
-sort_nCells_OXC2 <- arrange(sort_nCells_OXC2, Treatment)
+# sort_nCells_OXC2 <- arrange(sort_nCells_OXC2, Treatment)
 sort_nCells_OXC2
 
 # same process as for sort_nCells_OXC2
@@ -395,7 +398,6 @@ filtered_nCells <- nCells_celltype_treatment %>% filter(
 filtered_nCells
 
 # for getting a formatted table of the filtered cells (above)
-library(knitr)
 kable(sort_nCells_OXC2, format = "markdown")
 
 #### Cellcount per celltype per group (whole OXC2 and WTC) ####
