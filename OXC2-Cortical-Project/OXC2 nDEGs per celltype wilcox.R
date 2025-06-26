@@ -302,7 +302,7 @@ celltype_order <- c(
 
 deg_long$Celltype <- factor(deg_long$Celltype, levels = celltype_order)
 
-# plotting
+# plotting av DEGs
 ggplot(deg_long, aes(x = Celltype, y = DEG_Count, fill = Treatment)) +
         geom_bar(stat = "identity", position = position_dodge(width = 0.6), width = 0.6) +
         theme_minimal() +
@@ -363,7 +363,40 @@ deg_long %>%
 
 # get the dataframe containing information on cellcount for each celltype and treatment
 nCells_celltype_treatment <- read_xlsx("./nCells per celltype per treatment.xlsx")
-head(nCells_celltype_treatment, n = 10)
+
+# set new name for the treatments in the cellcount file/dataframe
+nCellLabel_map <- data.frame(
+  Treatment = c(
+    "4-OXC2-DMSO-control", 
+    "1-OXC2-Miglustat-100uM", 
+    "2-OXC2-Acetyl-leucine", 
+    "3-OXC2-Mig-ace-leu",
+    
+    "11-WTC-control", 
+    "6-WTC-Miglustat-100uM", 
+    "8-WTC-Acetyl-leucine", 
+    "9-WTC-Mig-ace-leu"
+  ),
+  Label = c(
+    "nCell_Control_OXC",
+    "nCell_Mig_OXC",
+    "nCell_AceLeu_OXC",
+    "nCell_Combined_OXC",
+    
+    "nCell_Control_WTC",
+    "nCell_Mig_WTC",
+    "nCell_AceLeu_WTC",
+    "nCell_Combined_WTC"
+  )
+)
+
+nCells_celltype_treatment <- nCells_celltype_treatment %>%
+  left_join(nCellLabel_map, by = "Treatment") %>%
+  relocate(Label, .before = Treatment)
+
+nCells_celltype_treatment
+write_xlsx(nCells_celltype_treatment, "./nCells per celltype per treatment.xlsx")
+
 
 # sort the number of cells in only the OXC2 samples by treatment, disregarding celltype
 sort_nCells_OXC2 <- nCells_celltype_treatment %>% 
@@ -412,6 +445,7 @@ nCelltype <- nCells_celltype_treatment %>%
          summarise(Total_Cells = sum(Cellcount))
 
 
+
 # get number of celltype per group (total over all oxc2 treatments and wtc treatments)
 nCelltype <- nCelltype %>%
   mutate(Source = ifelse(grepl("OXC2", Treatment), "OXC2", "WTC")) %>% #add column 'Source', add OXC2 if 'OXC2' is in the Treatment-name, else 'WTC'
@@ -423,3 +457,5 @@ nCelltype
 #### ####
 # Formatted table 
 kable(nCelltype, format = "markdown")
+
+
