@@ -387,6 +387,13 @@ nCellLabel_map <- data.frame(
     "nCell_Mig_WTC",
     "nCell_AceLeu_WTC",
     "nCell_Combined_WTC"
+  ),
+  
+  DEG_label = c(
+    "ControlDEGs",
+    "MigDEGs",
+    "AceLeuDEGs",
+    "CombinedDEGs"
   )
 )
 
@@ -443,8 +450,6 @@ nCelltype <- nCells_celltype_treatment %>%
          Celltype %in% celltypeOI) %>% # extract line if the Celltype is 'Neuroblast'
          group_by(Treatment) %>% # group the result by Treatment (the same treatments will be next to eachother)
          summarise(Total_Cells = sum(Cellcount))
-
-
 
 # get number of celltype per group (total over all oxc2 treatments and wtc treatments)
 nCelltype <- nCelltype %>%
