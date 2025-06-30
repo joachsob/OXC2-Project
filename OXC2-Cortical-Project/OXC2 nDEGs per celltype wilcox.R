@@ -131,7 +131,7 @@ number_degs_control +
 
 # DEGs for Miglustat treatment
 condition_pairs <- list(
-  c("1-OXC2-Miglustat-100uM", "6-WTC-Miglustat-100uM")
+  c("1-OXC2-Miglustat-100uM", "11-WTC-control")
 )
 
 number_degs_Mig <- count_DEGs_wilcox(seuratObj, 
@@ -156,7 +156,7 @@ number_degs_Mig +
 
 # DEGs for ace-leu treatment
 condition_pairs <- list(
-  c("2-OXC2-Acetyl-leucine", "8-WTC-Acetyl-leucine")
+  c("2-OXC2-Acetyl-leucine", "11-WTC-control")
 )
 
 number_degs_ace_leu <- count_DEGs_wilcox(seuratObj, 
@@ -203,7 +203,7 @@ celltype_list <- list(
 )
 
 condition_pairs <- list(
-  c("3-OXC2-Mig-ace-leu", "9-WTC-Mig-ace-leu")
+  c("3-OXC2-Mig-ace-leu", "11-WTC-control")
 )
 
 
@@ -233,41 +233,41 @@ number_degs_combined$data <- rbind(number_degs_combined$data, missing_cell)
 
 #### Manage DEG-data ####
 # the next few lines were a one-time formatting of the data frame and excel file
-      # wb <- loadWorkbook("./DEGs/completeDEGdata.xlsx")
-      # deg_df <- data.frame(
-      #   Celltype = c(
-      #     "vRG",
-      #     "Granule Cells",
-      #     "NPCs",
-      #     "Proliferating Progenitors",
-      #     "SORCS1+ Immature Ex. Neurons",
-      #     "GAD1GAD2+ Granule Cells",
-      #     "oRG",
-      #     "Neuroblasts",
-      #     "ARPP21+ Immature Ex. Neurons",
-      #     "RELNGAD2+ Inh. Neurons",
-      #     "Migratory Granule Cells",
-      #     "GPC5GAD2+ Inh. Neurons",
-      #     "Preplate Neurons",
-      #     "ATP1A2+ Fibroblast-Like"
-      #     ),
-      #   
-      #   ControlDEGs = number_degs_control$data$DEG_Count,
-      #   
-      #   MigDEGs = number_degs_Mig$data$DEG_Count,
-      #   
-      #   AceLeuDEGs = number_degs_ace_leu$data$DEG_Count,
-      # 
-      #   CombinedDEGs = number_degs_combined$data$DEG_Count
-      #   )
-      # 
-      # write_xlsx(deg_df, path = "./DEGs/completeDEGdata.xlsx")
-      # 
-      # deg_data <- read_excel("./DEGs/completeDEGdata.xlsx")
-      # deg_data$CombinedDEGs <- as.numeric(deg_data$CombinedDEGs) # after adjusting this dataframe the datatype is set to chr
-      # 
-      # # update the excel file with corrected datatype for combined treatment values
-      # write_xlsx(deg_data, path = "./DEGs/completeDEGdata.xlsx")
+# wb <- loadWorkbook("./DEGs/completeDEGdata.xlsx")
+# deg_df <- data.frame(
+#   Celltype = c(
+#     "vRG",
+#     "Granule Cells",
+#     "NPCs",
+#     "Proliferating Progenitors",
+#     "SORCS1+ Immature Ex. Neurons",
+#     "GAD1GAD2+ Granule Cells",
+#     "oRG",
+#     "Neuroblasts",
+#     "ARPP21+ Immature Ex. Neurons",
+#     "RELNGAD2+ Inh. Neurons",
+#     "Migratory Granule Cells",
+#     "GPC5GAD2+ Inh. Neurons",
+#     "Preplate Neurons",
+#     "ATP1A2+ Fibroblast-Like"
+#     ),
+# 
+#   ControlDEGs = number_degs_control$data$DEG_Count,
+# 
+#   MigDEGs = number_degs_Mig$data$DEG_Count,
+# 
+#   AceLeuDEGs = number_degs_ace_leu$data$DEG_Count,
+# 
+#   CombinedDEGs = number_degs_combined$data$DEG_Count
+#   )
+# 
+# write_xlsx(deg_df, path = "./DEGs/completeDEGdata.xlsx")
+# 
+# deg_data <- read_excel("./DEGs/completeDEGdata.xlsx")
+# deg_data$CombinedDEGs <- as.numeric(deg_data$CombinedDEGs) # after adjusting this dataframe the datatype is set to chr, revert to numeric
+# 
+# # update the excel file with corrected datatype for combined treatment values
+# write_xlsx(deg_data, path = "./DEGs/completeDEGdata.xlsx")
 
 deg_data <- read_excel("./DEGs/completeDEGdata.xlsx")
 
@@ -364,17 +364,17 @@ deg_long %>%
 # get the dataframe containing information on cellcount for each celltype and treatment
 nCells_celltype_treatment <- read_xlsx("./nCells per celltype per treatment.xlsx")
 
-# set new name for the treatments in the cellcount file/dataframe
+# set new name for the treatments in the cellcount file/dataframe ----
 nCellLabel_map <- data.frame(
   Treatment = c(
-    "4-OXC2-DMSO-control", 
-    "1-OXC2-Miglustat-100uM", 
-    "2-OXC2-Acetyl-leucine", 
+    "4-OXC2-DMSO-control",
+    "1-OXC2-Miglustat-100uM",
+    "2-OXC2-Acetyl-leucine",
     "3-OXC2-Mig-ace-leu",
-    
-    "11-WTC-control", 
-    "6-WTC-Miglustat-100uM", 
-    "8-WTC-Acetyl-leucine", 
+
+    "11-WTC-control",
+    "6-WTC-Miglustat-100uM",
+    "8-WTC-Acetyl-leucine",
     "9-WTC-Mig-ace-leu"
   ),
   Label = c(
@@ -382,13 +382,13 @@ nCellLabel_map <- data.frame(
     "nCell_Mig_OXC",
     "nCell_AceLeu_OXC",
     "nCell_Combined_OXC",
-    
+
     "nCell_Control_WTC",
     "nCell_Mig_WTC",
     "nCell_AceLeu_WTC",
     "nCell_Combined_WTC"
   ),
-  
+
   DEG_label = c(
     "ControlDEGs",
     "MigDEGs",
@@ -396,14 +396,15 @@ nCellLabel_map <- data.frame(
     "CombinedDEGs"
   )
 )
+# 
+# nCells_celltype_treatment <- nCells_celltype_treatment %>%
+#   left_join(nCellLabel_map, by = "Treatment") %>%
+#   relocate(Label, .before = Treatment)
+# 
+# nCells_celltype_treatment
+# write_xlsx(nCells_celltype_treatment, "./nCells per celltype per treatment.xlsx")
 
-nCells_celltype_treatment <- nCells_celltype_treatment %>%
-  left_join(nCellLabel_map, by = "Treatment") %>%
-  relocate(Label, .before = Treatment)
-
-nCells_celltype_treatment
-write_xlsx(nCells_celltype_treatment, "./nCells per celltype per treatment.xlsx")
-
+#### ####
 
 # sort the number of cells in only the OXC2 samples by treatment, disregarding celltype
 sort_nCells_OXC2 <- nCells_celltype_treatment %>% 
@@ -444,12 +445,13 @@ kable(sort_nCells_OXC2, format = "markdown")
 
 # getting number of cells for a specific celltype in each treatment
 # change the name of the celltypeOI to the celltype of interest
-celltypeOI <- "Neuroblasts"
+celltypeOI <- "ARPP21+ Immature Ex. Neurons"
 nCelltype <- nCells_celltype_treatment %>% 
   filter(grepl("OXC2|WTC", Treatment), # extract line if 'OXC2' or 'WTC' is in the Treatment-name
          Celltype %in% celltypeOI) %>% # extract line if the Celltype is 'Neuroblast'
          group_by(Treatment) %>% # group the result by Treatment (the same treatments will be next to eachother)
          summarise(Total_Cells = sum(Cellcount))
+nCelltype
 
 # get number of celltype per group (total over all oxc2 treatments and wtc treatments)
 nCelltype <- nCelltype %>%
