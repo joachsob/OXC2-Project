@@ -113,8 +113,9 @@ condition_order <- c(
   "Combined"
 )
 
-deg_normalized_corrected$Celltype <- factor(deg_normalized$Celltype, levels = celltype_order)
-deg_normalized_corrected$Condition <- factor(deg_normalized$Condition, levels = condition_order)
+deg_normalized_corrected <- read_xlsx("./DEGs per cell.xlsx")
+deg_normalized_corrected$Celltype <- factor(deg_normalized_corrected$Celltype, levels = celltype_order)
+deg_normalized_corrected$Condition <- factor(deg_normalized_corrected$Condition, levels = condition_order)
 
 deg_long$Celltype <- factor(deg_long$Celltype, levels = celltype_order)
 deg_long$Condition <- factor(deg_long$Condition, levels = condition_order)
@@ -207,7 +208,7 @@ deg_normalized_corrected %>%
   ggplot(aes(x = Celltype, y = DEG_per_cell, fill = Condition)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.6), width = 0.5) +
   theme_minimal() +
-  labs(title = "DEGs per Cell by Cell Type and Treatment",
+  labs(title = "DEGs per Cell Count by Cell Type and Treatment",
        x = "Cell Type", y = "DEGs per Cell") +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
