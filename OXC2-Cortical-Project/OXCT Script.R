@@ -38,10 +38,10 @@ seuratObj$group <- sample_metadata$group[match(seuratObj$sample, sample_metadata
 table(seuratObj$group)
 
 #### ####
-DimPlot(seuratObj, split.by = "sample", label = TRUE, repel = TRUE, ncol = 4)
+DimPlot(seuratObj, label = TRUE, repel = TRUE)
 FeaturePlot(seuratObj, c("SP100", "STAT1", "IFI16"), ncol = 1, split.by = "group", order = TRUE)
 
-DimPlot(seuratObj, group.by = 'seurat_clusters', label = TRUE, repel = T)
+DimPlot(seuratObj, group.by = 'celltype', label = TRUE,repel = T)
 
 #### Create and list markers ####
 # A list of cell cycle markers, from Tirosh et al, 2015, is loaded with Seurat.  We can
