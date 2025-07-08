@@ -1,4 +1,5 @@
 library("scProportionTest")
+library(writexl)
 
 prop_test <- sc_utils(seuratObj)
 
