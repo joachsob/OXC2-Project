@@ -301,7 +301,7 @@ celltype_list <- list(
 
 # Define condition pairs for differential expression analysis
 condition_pairs <- list(
-  c("3-OXC2-Mig-ace-leu", "4-OXC2-DMSO-control")
+  c("6-WTC-Miglustat-100uM", "11-WTC-control")
 )
 
 # Define short names for conditions
@@ -311,7 +311,7 @@ condition_shortnames <- list(
 )
 
 # Define output directory
-output_dir <- "./GSEA results/OXC2 Combined vs OXC2 Control"
+output_dir <- "./GSEA results/WTC Miglustat vs WTC DMSO/"
 
 # Run the analysis using MAST
 perform_DEG_and_GSEA_analysis(
@@ -326,8 +326,4 @@ perform_DEG_and_GSEA_analysis(
   dea_method = "MAST"
 )
 
-OXC_combined_sample_subset <- subset(seuratObj, sample == "3-OXC2-Mig-ace-leu")
-table(OXC_combined_sample_subset$celltype)
 
-WTC_combined_sample_subset <- subset(seuratObj, sample == "9-WTC-Mig-ace-leu")
-table(WTC_combined_sample_subset$celltype)

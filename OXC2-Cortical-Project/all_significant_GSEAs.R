@@ -28,7 +28,7 @@ read_and_filter_sheet <- function(file, sheet) {
   # filter the results by adjusted p-value and selected columns
   df_filtered <- df %>%
     filter(p.adjust <= 0.05) %>%
-    select(c(ID, Description, setSize, NES, p.adjust, core_enrichment))
+    select(c(ID, Description, NES, p.adjust, core_enrichment))
   
   return(df_filtered)
 }
@@ -42,7 +42,6 @@ filtered_results <- map(significantGSEAs, function(file) {
 })
 names(filtered_results) <- basename(significantGSEAs) # name each top-level list item by the file name
 
-head(filtered_results)
 
 # combine every data frame (excel sheet) into one
 # containing every significant result from GSEA
