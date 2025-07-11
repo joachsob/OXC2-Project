@@ -1,3 +1,5 @@
+# COPY OF SCRIPT FOR SYNCING TO GITHUB
+
 library(readxl)
 library(dplyr)
 library(purrr)
@@ -5,10 +7,12 @@ library(writexl)
 library(tidyr)
 library(stringr)
 
+#
 
-path = "./GSEA results/WTC Miglustat vs WTC DMSO/"          # Path for GSEA results
+path = "./GSEA results/WTC Miglustat vs WTC DMSO/"           # Path where GSEA results are stored
 gsea_output_file = "WTCmiglustat_WTCDMSO_filteredGSEA.xlsx"  # Desired file for all significant GSEA results
-recurrent_genes_output_file = "WTCmiglustat_WTCDMSO_recurrent genes.xlsx" #Desired file for recurring genes
+deg_output_file = file.path(path, "WTCmiglustat_WTCDMSO_filteredDEG.xlsx") # set output file for the filtered result
+
 
 # Finding all GSEA files in the celltype sub-folders
 all_excel_files <- list.files(path = path, pattern = "\\.xlsx$", full.names =  TRUE, recursive = TRUE)
@@ -50,40 +54,80 @@ names(filtered_results) <- basename(gsea_files) # name each top-level list item 
 
 
 # combine every data frame (excel sheet) into one
-  # containing every significant result from GSEA
-all_results_named <- map2_dfr(filtered_results, names(filtered_results), function(sheet_list, file_name) {
+# containing every significant result from GSEA
+gsea_results <- map2_dfr(filtered_results, names(filtered_results), function(sheet_list, file_name) {
   map2_dfr(sheet_list, names(sheet_list), function(df, sheet_name) {
     if (nrow(df) > 0) {
       df %>%
         mutate(
           Celltype = cell_types[[file_name]], 
           Source = sheet_name
-          ) %>%
+        ) %>%
         relocate(Celltype, Source)  
     }
   })
 })
 
-# write all significant GSEA results to an Excel file in desired path/file
-write_xlsx(all_results_named, file.path(path, gsea_output_file))
+
+# create one sheet in excel file for each celltype for managebility
+gsea_split_by_celltype <- split(gsea_results, gsea_results$Celltype)
+# clean sheet names cuz Excel is weird abt special characters
+names(gsea_split_by_celltype) <- make.names(names(gsea_split_by_celltype))
+
+# Write to file
+write_xlsx(gsea_split_by_celltype, file.path(path, gsea_output_file))
 
 
-#### Create a list of the most recurring genes throughout the GSEA results ####
 
-# select and split gene list
-all_genes <- all_results_named %>% 
-  select(core_enrichment) %>%                                     # select gene column
-  filter(!is.na(core_enrichment)) %>%                             # Remove NAs
-  mutate(core_enrichment = str_split(core_enrichment, "/")) %>%   # Split gene list into vectors
-  unnest(core_enrichment) %>%                                     # Flatten the list into rows
-  rename(Gene = core_enrichment)
 
-gene_counts <- all_genes %>%
-  group_by(Gene) %>%
-  summarise(Appearances = n()) %>%
-  arrange(desc(Appearances))
 
-recurrent_genes <- gene_counts %>%
-  filter(Appearances > 1)
+#### Create file with all DEG results ####
 
-write_xlsx(recurrent_genes, file.path(path, recurrent_genes_output_file))
+# uses the code from first part - collecting all files containing DEG information
+deg_files <- all_excel_files[grepl("DEG", basename(all_excel_files), ignore.case = TRUE)]
+deg_cell_types <- basename(dirname(deg_files))
+names(deg_cell_types) <- basename(deg_files)
+
+
+# adjusted filtering function for DEG files
+read_and_filter_deg_sheet <- function(file) {
+  df <- read_excel(file)
+  
+  print(paste("Reading:", basename(file)))
+  print(colnames(df))
+  print(str(df$p.adjust))
+  
+  # If p.adjust is not numeric, convert or skip
+  if (!"p_val_adj" %in% colnames(df) || !is.numeric(df$p_val_adj)) {
+    message("Skipping: p.adjust missing or not numeric")
+    return(tibble())  # Return empty tibble
+  }
+  
+  # filter the results by adjusted p-value and selected columns
+  df_filtered <- df %>%
+    filter(p_val_adj <= 0.05) %>%
+    select(c(gene, avg_log2FC, pct.1, pct.2, p_val_adj))
+  
+  return(df_filtered)
+}
+
+deg_results <- map2_dfr(deg_files, basename(deg_files), function(file, file_name) {
+  df <- read_and_filter_deg_sheet(file)
+  
+  if (nrow(df) > 0) {
+    df %>%
+      mutate(
+        Celltype = deg_cell_types[[file_name]],
+      ) %>%
+      relocate(Celltype)
+  }
+})
+
+# create one sheet in excel file for each celltype for managebility
+deg_split_by_celltype <- split(deg_results, deg_results$Celltype)
+# clean sheet names cuz Excel is weird abt special characters
+names(deg_split_by_celltype) <- make.names(names(deg_split_by_celltype))
+
+# Write to file
+write_xlsx(deg_split_by_celltype, deg_output_file)
+
