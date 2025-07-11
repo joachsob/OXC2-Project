@@ -15,10 +15,10 @@ deg_output_file = file.path(path, "WTCmiglustat_WTCDMSO_filteredDEG.xlsx") # set
 
 
 # Finding all GSEA files in the celltype sub-folders
-all_excel_files <- list.files(path = path, pattern = "\\.xlsx$", full.names =  TRUE, recursive = TRUE)
-gsea_files <- all_excel_files[grepl("GSEA", basename(all_excel_files), ignore.case = TRUE)]
-cell_types <- basename(dirname(gsea_files))
-names(cell_types) <- basename(gsea_files)
+all_excel_files <- list.files(path = path, pattern = "\\.xlsx$", full.names =  TRUE, recursive = TRUE) # list all excel files in GSEA results folder
+gsea_files <- all_excel_files[grepl("GSEA", basename(all_excel_files), ignore.case = TRUE)] # list all GSEA excel files 
+cell_types <- basename(dirname(gsea_files)) # list all celltypes in the GSEA results
+names(cell_types) <- basename(gsea_files) # name each element in cell_types by celltype name for reference
 
 
 # function to read and filter sheets in excel files
@@ -44,7 +44,7 @@ read_and_filter_sheet <- function(file, sheet) {
 }
 
 # use the filter function to extract the significant results 
-filtered_results <- map(gsea_files, function(file) {
+filtered_results <- map(gsea_files, function(file) { #map() -> apply function to each element in gsea_files
   sheets <- excel_sheets(file) # get names of all sheets in the Excel file
   sheet_data <- map(sheets, ~ read_and_filter_sheet(file, .x)) # apply filter function to each sheet
   names(sheet_data) <- sheets # name each element in the list by its sheet name
