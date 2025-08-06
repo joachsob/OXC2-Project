@@ -1,6 +1,6 @@
 library(Seurat)
 library(readxl)
- # THIS SCRIPT IS CURRENTLY USING HCMV SCRIPT AS TEMPLATE, AND IS NOT UPDATED FOR OXC2
+
 seuratObj <- readRDS('oxcwtc_seurat.RDS')
 
 treatment_order <- c(
